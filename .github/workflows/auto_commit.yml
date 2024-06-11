@@ -1,0 +1,39 @@
+name: Commit cheat
+
+on:
+  push:
+    branches:
+      - master
+      
+  schedule:
+    - cron: "0 0 * * *"
+
+jobs:
+  auto_commit:
+    runs-on: windows-latest 
+    steps:
+      - name: Set global directory
+        run: git config --global --add safe.directory /github/workspace
+      - uses: actions/checkout@v3     
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Modify last update
+        run: |
+          $d = Get-Date -Format 'yyyy-MM-ddTHH:mm:ssZ'
+          Set-Content -Path LAST_UPDATED -Value $d
+      - name: Commit changes
+        run: |
+          git config --local user.email "lutfihakim1606@gmail.com"
+          git config --local user.name "hakimlutfi46"
+          git add -A
+          git commit -m "Liat apa bang?"
+      - name: Pull from remote
+        run: git pull origin master --rebase
+      - name: GitHub Push
+        uses: github-actions-x/commit@v3
+        with:
+          commit-message: "Liat apa bang?"
+          branch: master
+          force: true
+          github-token: ${{ secrets.SECRET_TOKEN }}
